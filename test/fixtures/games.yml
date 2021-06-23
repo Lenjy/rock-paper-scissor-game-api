@@ -1,11 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  name_user: MyString
   move_user: MyString
   move_bot: MyString
   result: MyString
 
 two:
+  name_user: MyString
   move_user: MyString
   move_bot: MyString
   result: MyString
