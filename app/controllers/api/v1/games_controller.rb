@@ -1,6 +1,11 @@
 class Api::V1::GamesController < Api::V1::BaseController
+  before_action :set_game, only: [ :show ]
+
   def index
     @games = Game.all
+  end
+
+  def show
   end
 
   def create 
@@ -16,8 +21,16 @@ class Api::V1::GamesController < Api::V1::BaseController
 
   private
 
+  def set_game
+    @game = Game.find(params[:id])
+  end
+
   def choose_move_bot
     return ["scissor", "paper", "rock"].sample
+  end
+
+  def game_params
+    params.require(:game).permit(:name_user, :move_user)
   end
 
   def result_message
