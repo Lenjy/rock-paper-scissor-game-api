@@ -9,10 +9,12 @@ class Api::V1::GamesController < Api::V1::BaseController
   end
 
   def create 
-    @game = Game.new(game_params)
-    @game.move_bot = choose_move_bot
-    @game.result = result_message
-    if @game.save
+    @game = Game.new()
+    @move = Move.new(name: params[:name], move: params[:move].downcase, game_id: @game)
+    raise
+    if @move.save
+      Move.create(name: "bot", move: choose_move_bot, game_id: @game)
+      @game.result = result_message
       render :show, status: :created
     else
       render_error
@@ -29,40 +31,38 @@ class Api::V1::GamesController < Api::V1::BaseController
     return ["scissor", "paper", "rock"].sample
   end
 
-  def game_params
-    params.require(:game).permit(:name_user, :move_user)
+  def move_params
+    params.permit(:name, :move)
   end
 
   def result_message
-    message = ""
-    case @game.move_user.downcase
+    case @game.moves[0]
     when "scissor"
-      if @game.move_bot == "paper"
-        message = "#{@game.name_user} win"
-      elsif @game.move_bot == "rock"
-        message = "#{@game.name_user} lose"
+      if @game.moves[1] == "paper"
+        message = "#{@game.moves[0].name} win"
+      elsif @game.moves[1] == "rock"
+        message = "#{@game.moves[0].name} lose"
       else
-        message = "it'a tie for #{@game.name_user} and the bot"
+        message = "it'a tie for #{@game.moves[0].name} and the bot"
       end
     when "paper"
-      if @game.move_bot == "paper"
-        message = "it'a tie for #{@game.name_user} and the bot"
-      elsif @game.move_bot == "rock"
-        message = "#{@game.name_user} win"
+      if @game.moves[1] == "paper"
+        message = "it'a tie for #{@game.moves[0].name} and the bot"
+      elsif @game.moves[1] == "rock"
+        message = "#{@game.moves[0].name} win"
       else
-        message = "#{@game.name_user} lose"
-      end
-    when "rock"
-      if @game.move_bot == "paper"
-        message = "#{@game.name_user} lose"
-      elsif @game.move_bot == "rock"
-        message = "it'a tie for #{@game.name_user} and the bot"
-      else
-        message = "#{@game.name_user} win"
+        message = "#{@game.moves[0].name} lose"
       end
     else
-      message = "Error"
+      if @game.moves[1] == "paper"
+        message = "#{@game.moves[0].name} lose"
+      elsif @game.moves[1] == "rock"
+        message = "it'a tie for #{@game.moves[0].name} and the bot"
+      else
+        message = "#{@game.moves[0].name} win"
+      end
     end
     return message
   end
+
 end

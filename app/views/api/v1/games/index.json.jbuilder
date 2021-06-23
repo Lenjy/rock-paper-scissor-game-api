@@ -1,3 +1,6 @@
 json.array! @games do |game|
-  json.extract! game, :name_user, :move_user, :move_bot, :result
+  json.array! game.moves do |move|
+    json.extract! move, :name, :move
+  end
+  json.extract! game, :result
 end
