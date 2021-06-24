@@ -3,6 +3,7 @@ class Api::V1::GamesController < Api::V1::BaseController
 
   def index
     @games = Game.all
+    @moves =
   end
 
   def show
@@ -10,10 +11,9 @@ class Api::V1::GamesController < Api::V1::BaseController
 
   def create 
     @game = Game.new()
-    @move = Move.new(name: params[:name], move: params[:move].downcase, game_id: @game)
-    raise
+    @move = Move.new(name: move_params[:name].downcase, move: move_params[:move], game_id: @game.id)
     if @move.save
-      Move.create(name: "bot", move: choose_move_bot, game_id: @game)
+      Move.create(name: "bot", move: choose_move_bot, game_id: @game.id)
       @game.result = result_message
       render :show, status: :created
     else
@@ -36,7 +36,7 @@ class Api::V1::GamesController < Api::V1::BaseController
   end
 
   def result_message
-    case @game.moves[0]
+    case @game.moves[0].downcase
     when "scissor"
       if @game.moves[1] == "paper"
         message = "#{@game.moves[0].name} win"

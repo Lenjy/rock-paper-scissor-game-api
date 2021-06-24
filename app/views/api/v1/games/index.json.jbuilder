@@ -1,6 +1,4 @@
 json.array! @games do |game|
-  json.array! game.moves do |move|
-    json.extract! move, :name, :move
-  end
-  json.extract! game, :result
+  json.array! @game.moves, :name, :move
+  json.extract! @game, :result
 end
