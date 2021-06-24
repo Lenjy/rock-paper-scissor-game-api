@@ -3,6 +3,7 @@ class Api::V1::GamesController < Api::V1::BaseController
 
   def index
     @games = Game.all
+    @total_games = @games.count
   end
 
   def show
@@ -10,13 +11,14 @@ class Api::V1::GamesController < Api::V1::BaseController
 
   def create 
     @game = Game.create!()
-    @move = Move.new(name: move_params[:name].downcase, move: move_params[:move], game_id: @game.id)
-    if @move.save!
+    @move = Move.new(name: move_params[:name], move: move_params[:move].downcase, game_id: @game.id)
+    if @move.save
       Move.create!(name: "bot", move: choose_move_bot, game_id: @game.id)
       @game.result = result_message
       @game.save!
       render :show, status: :created
     else
+      @game.destroy
       render_error
     end
   end
@@ -35,31 +37,36 @@ class Api::V1::GamesController < Api::V1::BaseController
     params.permit(:name, :move)
   end
 
+  def render_error
+    render json: { errors: "wrong move" },
+      status: :unprocessable_entity
+  end
+
   def result_message
-    case @game.moves[0].move.downcase
+    case @game.moves.first.move.downcase
     when "scissor"
-      if @game.moves[1].move == "paper"
-        message = "#{@game.moves[0].name} win"
-      elsif @game.moves[1].move == "rock"
-        message = "#{@game.moves[0].name} lose"
+      if @game.moves.last.move == "paper"
+        message = "#{@game.moves.first.name} win"
+      elsif @game.moves.last.move == "rock"
+        message = "#{@game.moves.first.name} lose"
       else
-        message = "it'a tie for #{@game.moves[0].name} and the bot"
+        message = "it'a tie for #{@game.moves.first.name} and the bot"
       end
     when "paper"
-      if @game.moves[1].move == "paper"
-        message = "it'a tie for #{@game.moves[0].name} and the bot"
-      elsif @game.moves[1].move == "rock"
-        message = "#{@game.moves[0].name} win"
+      if @game.moves.last.move == "paper"
+        message = "it'a tie for #{@game.moves.first.name} and the bot"
+      elsif @game.moves.last.move == "rock"
+        message = "#{@game.moves.first.name} win"
       else
-        message = "#{@game.moves[0].name} lose"
+        message = "#{@game.moves.first.name} lose"
       end
     else
-      if @game.moves[1].move == "paper"
-        message = "#{@game.moves[0].name} lose"
-      elsif @game.moves[1].move == "rock"
-        message = "it'a tie for #{@game.moves[0].name} and the bot"
+      if @game.moves.last.move == "paper"
+        message = "#{@game.moves.first.name} lose"
+      elsif @game.moves.last.move == "rock"
+        message = "it'a tie for #{@game.moves.first.name} and the bot"
       else
-        message = "#{@game.moves[0].name} win"
+        message = "#{@game.moves.first.name} win"
       end
     end
     return message

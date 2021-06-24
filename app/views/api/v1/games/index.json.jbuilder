@@ -1,4 +1,7 @@
+# json.number @total_games
+
 json.array! @games do |game|
-  json.array! @game.moves, :name, :move
-  json.extract! @game, :result
+  json.moves game.moves, :name, :move
+  json.result game.result
+  json.timestamps game.created_at
 end
