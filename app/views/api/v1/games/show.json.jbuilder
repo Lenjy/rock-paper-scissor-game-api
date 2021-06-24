@@ -1,2 +1,3 @@
-json.array! @game, :name, :move
-json.extract! @game, :result
+json.moves @game.moves, :name, :move
+
+json.result @game.result
