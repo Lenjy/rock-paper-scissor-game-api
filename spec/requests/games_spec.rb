@@ -8,8 +8,8 @@ describe "Games API", type: :request do
       FactoryBot.create(:move, name: "bot", move: "rock", game_id: game1.id )
   
       game2 = FactoryBot.create(:game, result: "Ben lose")
-      FactoryBot.create(:move, name: "ben", move: "paper", game_id: game1.id )
-      FactoryBot.create(:move, name: "bot", move: "scissor", game_id: game1.id )
+      FactoryBot.create(:move, name: "ben", move: "paper", game_id: game2.id )
+      FactoryBot.create(:move, name: "bot", move: "scissor", game_id: game2.id )
   
       get '/api/v1/games'
   
